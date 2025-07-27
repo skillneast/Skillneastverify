@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Key Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #0d0f1a;
+            --card-background-color: rgba(28, 30, 48, 0.75);
+            --text-color-primary: #f0f0f5;
+            --text-color-secondary: #a0a0b0;
+            --accent-gradient-start: #00d2ff;
+            --accent-gradient-end: #d122e3;
+            --success-color: #28a745;
+            --glow-color-soft: rgba(209, 34, 227, 0.2);
+            --glow-color-strong: rgba(0, 210, 255, 0.4);
+            --card-border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Exo 2', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color-primary);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #particles-js {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1;
+        }
+
+        .main-container {
+            width: 100%; max-width: 450px; z-index: 1;
+        }
+
+        .header {
+            display: flex; align-items: center; margin-bottom: 20px; justify-content: space-between;
+        }
+        .header h1 {
+            font-size: 1.2rem; margin: 0; flex-grow: 1; text-align: center; font-weight: 600; color: var(--text-color-secondary);
+        }
+        .close-btn {
+            font-size: 1.5rem; cursor: pointer; color: var(--text-color-secondary);
+        }
+
+        .generator-card, .how-to-card {
+            background-color: var(--card-background-color);
+            border-radius: 25px;
+            padding: 30px;
+            border: 1px solid var(--card-border-color);
+            backdrop-filter: blur(15px);
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .generator-card .icon-container {
+            width: 80px; height: 80px;
+            background: linear-gradient(145deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto;
+            box-shadow: 0 0 25px var(--glow-color-strong);
+        }
+        .generator-card .icon-container .fa-key { font-size: 36px; color: white; }
+
+        .generator-card h2 {
+            font-size: 2.5rem; margin: 0 0 10px 0; font-weight: 800;
+            background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent;
+        }
+        .generator-card .subtitle { color: var(--text-color-secondary); margin-bottom: 30px; font-size: 1.1rem; }
+
+        .info-cards-container {
+            background-color: rgba(0, 0, 0, 0.3); border-radius: 20px; padding: 15px; margin-bottom: 30px;
+        }
+        .info-card {
+            display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--card-border-color);
+        }
+        .info-card:last-child { border-bottom: none; }
+        .info-card .info-icon { color: var(--text-color-secondary); width: 30px; }
+        .info-card .info-label { color: var(--text-color-secondary); flex-grow: 1; text-align: left; font-weight: 400; }
+        .info-card .info-value { font-weight: 700; font-size: 1.1rem; }
+        
+        .generate-button {
+            display: block; width: 100%; padding: 18px; border: none; border-radius: 15px;
+            background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            color: white; font-size: 1.2rem; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease-in-out; text-decoration: none;
+            box-shadow: 0 5px 20px var(--glow-color-soft);
+        }
+        .generate-button:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px var(--glow-color-strong);
+        }
+        
+        .how-to-card { text-align: left; }
+        .how-to-card h3 {
+            font-size: 1.5rem; font-weight: 700; margin: 0 0 10px 0;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .how-to-card h3 .fa-thumbs-up { color: var(--accent-gradient-start); }
+        .how-to-card .subtitle { 
+            color: var(--text-color-secondary); margin-bottom: 20px;
+            font-size: 1.1rem; line-height: 1.5; text-align: left;
+        }
+        
+        /* --- NAYA TUTORIAL BUTTON STYLE --- */
+        .tutorial-button {
+            display: block; width: 100%; padding: 15px;
+            margin-bottom: 25px; border-radius: 15px;
+            text-decoration: none; color: var(--text-color-primary);
+            font-weight: 600; font-size: 1.1rem; text-align: center;
+            cursor: pointer; transition: all 0.3s ease;
+            background: linear-gradient(var(--card-background-color), var(--card-background-color)) padding-box,
+                        linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end)) border-box;
+            border: 2px solid transparent;
+        }
+        .tutorial-button:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            border-color: transparent; color: white;
+            box-shadow: 0 5px 15px var(--glow-color-soft);
+        }
+        .tutorial-button i { margin-right: 8px; }
+        
+        .divider {
+            border: none; height: 1px;
+            background-color: var(--card-border-color);
+            margin: 0 0 25px 0;
+        }
+        
+        .instructions-list { list-style: none; padding: 0; margin: 0; text-align: left; font-size: 1.05rem; }
+        .instructions-list li { display: flex; align-items: center; margin-bottom: 20px; gap: 18px; }
+        .instructions-list li:last-child { margin-bottom: 0; }
+        .instructions-list .instruction-icon { font-size: 1.1rem; flex-shrink: 0; }
+        .icon-lightbulb { color: #ffc107; } .icon-target { color: #dc3545; } .icon-warning { color: #ffc107; }
+
+        .success-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--background-color); justify-content: center; align-items: center; text-align: center; flex-direction: column; z-index: 10; }
+        .success-card { background-color: var(--card-background-color); border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--card-border-color); backdrop-filter: blur(15px); }
+        .success-icon { width: 90px; height: 90px; background-color: var(--success-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 25px auto; box-shadow: 0 0 25px rgba(40, 167, 69, 0.5); }
+        .success-icon .fa-check { font-size: 40px; color: white; }
+        .success-card h2 { font-size: 2rem; margin: 0 0 10px 0; font-weight: 700; }
+        .success-card p { color: var(--text-color-secondary); margin: 0; font-size: 1.1rem; }
+        .success-card .redirect-msg { margin-top: 25px; font-size: 1rem; color: var(--text-color-secondary); }
+    </style>
+</head>
+<body>
+    
+    <div id="particles-js"></div>
+
+    <div class="main-container" id="mainContainer">
+        <div class="header">
+            <i class="fas fa-times close-btn"></i>
+            <h1>Generate Access Key</h1>
+            <div style="width: 24px;"></div>
+        </div>
+
+        <div class="generator-card">
+            <div class="icon-container">
+                <i class="fas fa-key"></i>
+            </div>
+            <h2>Access Key Generator</h2>
+            <p class="subtitle">Generate your secure access key instantly</p>
+            <div class="info-cards-container">
+                <div class="info-card"><i class="fas fa-clock info-icon"></i><span class="info-label">Validity</span><span class="info-value">24 Hours</span></div>
+                <div class="info-card"><i class="fas fa-bolt info-icon"></i><span class="info-label">Generation</span><span class="info-value">Instant</span></div>
+                <div class="info-card"><i class="fas fa-shield-halved info-icon"></i><span class="info-label">Security</span><span class="info-value">Advanced</span></div>
+            </div>
+            <button class="generate-button" id="generateButton">Generate Access Key</button>
+        </div>
+
+        <div class="how-to-card">
+            <h3><i class="fa-solid fa-thumbs-up"></i> How to Generate Key</h3>
+            <p class="subtitle">Watch this quick tutorial to learn the process</p>
+            
+            <!-- !! NAYA TUTORIAL BUTTON !! -->
+            <a id="tutorialLink" href="#" class="tutorial-button" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-play-circle"></i> Watch Tutorial
+            </a>
+
+            <hr class="divider">
+            
+            <ul class="instructions-list">
+                <li><i class="fa-solid fa-lightbulb instruction-icon icon-lightbulb"></i><span>Watch the tutorial before generating your key</span></li>
+                <li><i class="fa-solid fa-bullseye instruction-icon icon-target"></i><span>Follow the steps exactly as shown in the video</span></li>
+                <li><i class="fa-solid fa-triangle-exclamation instruction-icon icon-warning"></i><span>Keep your generated key secure and private</span></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="success-container" id="successContainer">
+        <div class="success-card">
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <h2>Key Generated!</h2>
+            <p>24 hours key generated successfully 🎉</p>
+            <p class="redirect-msg">Redirecting you in <span id="countdown">3</span>s...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS('particles-js', { particles: { number: { value: 60, density: { enable: true, value_area: 800 } }, color: { value: "#ffffff" }, shape: { type: "circle" }, opacity: { value: 0.5, random: true }, size: { value: 3, random: true }, line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.2, width: 1 }, move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" } }, interactivity: { detect_on: "canvas", events: { onhover: { enable: true, mode: "repulse" }, resize: true } }, retina_detect: true });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // ==========================================================
+            // === CONFIGURATION: APNI DETAILS YAHAAN DAALEIN ===
+            // ==========================================================
+            const shortenerUrl = "https://your-shortener-link.com/goes-here"; // <--!! CHANGE THIS !!-->
+            const mainWebsiteUrl = "https://your-main-website.com/index.html"; // <--!! CHANGE THIS !!-->
+            
+            // !! APNA TUTORIAL LINK YAHA DAALEIN !!
+            const tutorialLinkUrl = "https://youtu.be/vaNnUq8QCag?si=ESFRY3evkKaIXCNJ"; // <--!! CHANGE THIS !!-->
+
+            // ==========================================================
+            // === LOGIC START: ISKE NEECHE KUCH CHANGE NA KAREIN ===
+            // ==========================================================
+            const mainContainer = document.getElementById('mainContainer');
+            const successContainer = document.getElementById('successContainer');
+
+            function setAccessCookie() {
+                const d = new Date();
+                d.setTime(d.getTime() + (24 * 60 * 60 * 1000));
+                let expires = "expires=" + d.toUTCString();
+                document.cookie = "accessGranted=true;" + expires + ";path=/";
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+
+            if (status === 'success') {
+                mainContainer.style.display = 'none';
+                successContainer.style.display = 'flex';
+                setAccessCookie();
+
+                let countdownElement = document.getElementById('countdown');
+                let seconds = 3;
+                countdownElement.textContent = seconds;
+
+                const interval = setInterval(() => {
+                    seconds--;
+                    countdownElement.textContent = seconds;
+                    if (seconds <= 0) {
+                        clearInterval(interval);
+                        window.location.href = mainWebsiteUrl;
+                    }
+                }, 1000);
+
+            } else {
+                mainContainer.style.display = 'block';
+                successContainer.style.display = 'none';
+
+                document.getElementById('generateButton').addEventListener('click', () => {
+                    window.location.href = shortenerUrl;
+                });
+                
+                // Set tutorial button link
+                document.getElementById('tutorialLink').setAttribute('href', tutorialLinkUrl);
+            }
+        });
+    </script>
+</body>
+</html>
