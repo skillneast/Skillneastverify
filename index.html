@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- HIGH QUALITY UI STYLES --- */
         :root {
             --background-color: #0F0F16;
             --card-background-color: rgba(30, 30, 48, 0.6);
@@ -21,7 +20,6 @@
             --card-border-color: rgba(255, 255, 255, 0.1);
             --icon-box-color: rgba(0, 0, 0, 0.25);
         }
-
         body {
             margin: 0;
             font-family: 'Exo 2', sans-serif;
@@ -29,13 +27,12 @@
             color: var(--text-color-primary);
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Aligned to top */
+            align-items: flex-start;
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
             overflow-y: auto;
         }
-
         #particles-js {
             position: fixed;
             width: 100%;
@@ -44,14 +41,12 @@
             left: 0;
             z-index: -1;
         }
-
         .main-container, .success-page-container {
             width: 100%;
             max-width: 450px;
             z-index: 1;
-            display: none; /* Initially hide both */
+            display: none;
         }
-
         .header {
             display: flex;
             align-items: center;
@@ -59,22 +54,19 @@
             justify-content: space-between;
             padding: 10px 5px;
         }
-
         .header h1 {
-            font-size: 1.1rem; /* Image ke hisaab se chhota size */
+            font-size: 1.1rem;
             margin: 0;
             flex-grow: 1;
             text-align: center;
             font-weight: 500;
             color: var(--text-color-primary);
         }
-
         .close-btn {
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--text-color-secondary);
         }
-
         .generator-card, .how-to-card, .success-card {
             background-color: var(--card-background-color);
             border-radius: 25px;
@@ -85,76 +77,62 @@
             margin-bottom: 25px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
-
-        /* Access Key Generator Card Styles */
         .generator-card .icon-container {
             width: 90px;
             height: 90px;
             background: linear-gradient(145deg, var(--accent-gradient-start), var(--accent-gradient-end));
-            border-radius: 22px; /* Rounded square, not circle */
+            border-radius: 22px;
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 0 auto 25px auto;
             box-shadow: 0 4px 20px rgba(0, 210, 255, 0.3);
         }
-
-        .generator-card .icon-container .fa-lock { /* New Icon */
+        .generator-card .icon-container .fa-lock {
             font-size: 40px;
             color: white;
         }
-
         .generator-card h2 {
-            font-size: 2.2rem; /* Thoda bada text */
+            font-size: 2.2rem;
             margin: 0 0 10px 0;
             font-weight: 700;
             color: var(--text-color-primary);
         }
-
         .generator-card .subtitle {
             color: var(--text-color-secondary);
             margin-bottom: 30px;
             font-size: 1.1rem;
         }
-
-        /* Info Box Styling (Validity, etc.) */
         .info-box {
             background-color: var(--icon-box-color);
             border-radius: 20px;
             padding: 15px 20px;
             margin-bottom: 30px;
         }
-
         .info-item {
             display: flex;
             align-items: center;
             padding: 12px 0;
         }
-        
         .info-item:not(:last-child) {
              border-bottom: 1px solid var(--card-border-color);
         }
-
         .info-item .info-icon {
             color: var(--text-color-secondary);
             width: 30px;
             font-size: 1.1rem;
         }
-
         .info-item .info-label {
             color: var(--text-color-secondary);
             flex-grow: 1;
             text-align: left;
             font-weight: 500;
         }
-
         .info-item .info-value {
             font-weight: 600;
             font-size: 1.1rem;
             color: var(--text-color-primary);
         }
-
-        /* Buttons */
         .action-button {
             display: block;
             width: 100%;
@@ -174,8 +152,6 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 25px rgba(227, 34, 217, 0.3);
         }
-        
-        /* How to Generate Card Styles */
         .how-to-card {
             text-align: left;
         }
@@ -189,16 +165,14 @@
         .how-to-card h3 .fa-thumbs-up {
             color: var(--accent-gradient-start);
         }
-
-        /* --- VIDEO THUMBNAIL STYLE --- */
         .video-thumbnail-link {
             display: block;
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%;
             border-radius: 15px;
             background-color: #000;
-            background-image: url('https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'); /* Example thumbnail */
+            background-image: url('https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg');
             background-size: cover;
             background-position: center;
             margin-bottom: 25px;
@@ -217,8 +191,6 @@
         .video-thumbnail-link:hover .play-icon {
             transform: translate(-50%, -50%) scale(1.1);
         }
-
-
         .instructions-list {
             list-style: none;
             padding: 0;
@@ -239,16 +211,72 @@
         .icon-lightbulb { color: #ffc107; }
         .icon-target { color: #dc3545; }
         .icon-warning { color: #ffc107; }
-
-        /* Success Page */
-        .success-card { padding: 40px; }
-        .success-card .success-icon { font-size: 60px; color: var(--success-color); margin-bottom: 20px; }
-        .success-card h2 { font-size: 2.2rem; margin: 0 0 10px 0; color: var(--success-color); font-weight: 800; }
-        .success-card p { color: var(--text-color-secondary); font-size: 1.1rem; line-height: 1.6; }
-        .access-key-box { background-color: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; margin: 25px 0; user-select: all; border: 1px dashed var(--card-border-color); color: var(--text-color-primary); }
-        .copy-button { display: inline-flex; align-items: center; gap: 10px; background-color: var(--success-color); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
-        .expiry-note { font-size: 0.9rem; margin-top: 25px; color: var(--text-color-secondary); opacity: 0.8; }
-        .visit-button { display: block; width: 80%; margin: 20px auto 0 auto; padding: 15px; border-radius: 15px; text-decoration: none; color: var(--text-color-primary); font-weight: 600; text-align: center; cursor: pointer; background: linear-gradient(var(--card-background-color), var(--card-background-color)) padding-box, linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end)) border-box; border: 2px solid transparent; transition: all 0.3s; }
+        .success-card {
+            padding: 40px;
+        }
+        .success-card .success-icon {
+            font-size: 60px;
+            color: var(--success-color);
+            margin-bottom: 20px;
+        }
+        .success-card h2 {
+            font-size: 2.2rem;
+            margin: 0 0 10px 0;
+            color: var(--success-color);
+            font-weight: 800;
+        }
+        .success-card p {
+            color: var(--text-color-secondary);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .access-key-box {
+            background-color: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin: 25px 0;
+            user-select: all;
+            border: 1px dashed var(--card-border-color);
+            color: var(--text-color-primary);
+        }
+        .copy-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .expiry-note {
+            font-size: 0.9rem;
+            margin-top: 25px;
+            color: var(--text-color-secondary);
+            opacity: 0.8;
+        }
+        .visit-button {
+            display: block;
+            width: 80%;
+            margin: 20px auto 0 auto;
+            padding: 15px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: var(--text-color-primary);
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            background: linear-gradient(var(--card-background-color), var(--card-background-color)) padding-box, linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end)) border-box;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -258,42 +286,23 @@
         <div class="header">
             <i class="fas fa-times close-btn"></i>
             <h1>Generate Access Key</h1>
-            <div style="width: 24px;"></div> </div>
-
+            <div style="width: 24px;"></div>
+        </div>
         <div class="generator-card">
             <div class="icon-container"><i class="fas fa-lock"></i></div>
             <h2>Access Key Generator</h2>
             <p class="subtitle">Generate your secure access key instantly</p>
-            
             <div class="info-box">
-                <div class="info-item">
-                    <i class="fas fa-clock info-icon"></i>
-                    <span class="info-label">Validity</span>
-                    <span class="info-value" id="courseAccessDisplay">Loading...</span>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-bolt info-icon"></i>
-                    <span class="info-label">Generation</span>
-                    <span class="info-value">Instant</span>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-shield-halved info-icon"></i>
-                    <span class="info-label">Security</span>
-                    <span class="info-value">Advanced</span>
-                </div>
+                <div class="info-item"><i class="fas fa-clock info-icon"></i><span class="info-label">Validity</span><span class="info-value" id="courseAccessDisplay">Loading...</span></div>
+                <div class="info-item"><i class="fas fa-bolt info-icon"></i><span class="info-label">Generation</span><span class="info-value">Instant</span></div>
+                <div class="info-item"><i class="fas fa-shield-halved info-icon"></i><span class="info-label">Security</span><span class="info-value">Advanced</span></div>
             </div>
-
             <button class="action-button" id="generateButton">Generate Access Key</button>
         </div>
-
         <div class="how-to-card">
             <h3><i class="fa-solid fa-thumbs-up"></i> How to Generate Key</h3>
             <p class="subtitle">Watch this quick tutorial to learn the process</p>
-            
-            <a id="tutorialLink" href="#" class="video-thumbnail-link" target="_blank" rel="noopener noreferrer">
-                <i class="far fa-play-circle play-icon"></i>
-            </a>
-            
+            <a id="tutorialLink" href="#" class="video-thumbnail-link" target="_blank" rel="noopener noreferrer"><i class="far fa-play-circle play-icon"></i></a>
             <ul class="instructions-list">
                 <li><i class="fa-solid fa-lightbulb instruction-icon icon-lightbulb"></i><span>Watch the tutorial before generating your key</span></li>
                 <li><i class="fa-solid fa-bullseye instruction-icon icon-target"></i><span>Follow the steps exactly as shown in the video</span></li>
@@ -309,9 +318,7 @@
             <div class="access-key-box" id="accessKeyBox">Generating...</div>
             <button class="copy-button" id="copyButton"> <i class="fas fa-copy"></i> <span id="copyButtonText">Copy Key</span> </button>
             <p class="expiry-note" id="expiryNote">This key is for one-time use.</p>
-            <a id="visitCoursesBtn" href="#" class="visit-button" target="_blank">
-                <i class="fas fa-external-link-alt"></i> Visit Website and Enter Key
-            </a>
+            <a id="visitCoursesBtn" href="#" class="visit-button" target="_blank"><i class="fas fa-external-link-alt"></i> Visit Website and Enter Key</a>
         </div>
     </div>
 
@@ -320,9 +327,18 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
         import { getDatabase, ref, set, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
         
-        particlesJS('particles-js', { particles: { number: { value: 40,}, color: { value: "#ffffff" }, shape: { type: "circle" }, opacity: { value: 0.3, random: true }, size: { value: 2, random: true }, line_linked: { enable: false }, move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out", bounce: false, }, }, interactivity: { detect_on: "canvas", events: { onhover: { enable: false }, onclick: { enable: false }, resize: true, }, }, retina_detect: true, });
+        // ** YEH LINE THEEK KAR DI GAYI HAI **
+        particlesJS('particles-js', { particles: { number: { value: 40 }, color: { value: "#ffffff" }, shape: { type: "circle" }, opacity: { value: 0.3, random: true }, size: { value: 2, random: true }, line_linked: { enable: false }, move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out", bounce: false, } }, interactivity: { detect_on: "canvas", events: { onhover: { enable: false }, onclick: { enable: false }, resize: true, } }, retina_detect: true });
         
-        const firebaseConfig = { apiKey: "AIzaSyChwpbFb6M4HtG6zwjg0AXh7Lz9KjnrGZk", authDomain: "adminneast.firebaseapp.com", databaseURL: "https://adminneast-default-rtdb.firebaseio.com", projectId: "adminneast", storageBucket: "adminneast.appspot.com", messagingSenderId: "883877553418", appId: "1:883877553418:web:84ce8200f4b471bfffc6f3" };
+        const firebaseConfig = {
+            apiKey: "AIzaSyChwpbFb6M4HtG6zwjg0AXh7Lz9KjnrGZk",
+            authDomain: "adminneast.firebaseapp.com",
+            databaseURL: "https://adminneast-default-rtdb.firebaseio.com",
+            projectId: "adminneast",
+            storageBucket: "adminneast.appspot.com",
+            messagingSenderId: "883877553418",
+            appId: "1:883877553418:web:84ce8200f4b471bfffc6f3"
+        };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
@@ -355,8 +371,19 @@
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status');
             const referrer = document.referrer;
+            let isVerified = false;
 
-            if (status === 'success' && settings.shortenerDomain && referrer.includes(settings.shortenerDomain)) {
+            if (status === 'success') {
+                if (settings.shortenerDomain && settings.shortenerDomain.trim() !== '') {
+                    if (referrer && referrer.includes(settings.shortenerDomain)) {
+                        isVerified = true;
+                    }
+                } else {
+                    isVerified = true;
+                }
+            }
+
+            if (isVerified) {
                 showSuccessPage();
             } else {
                 showGeneratorPage();
