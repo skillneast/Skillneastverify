@@ -1,3 +1,5 @@
+--- START OF FILE access earn.html ---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,28 +13,52 @@
     <style>
         :root {
             --background-color: #0F0F16;
-            --card-background-color: rgba(30, 30, 48, 0.6);
+            --card-background-color: rgba(30, 30, 48, 0.7);
             --text-color-primary: #f0f0f5;
             --text-color-secondary: #a0a0b0;
             --accent-gradient-start: #00d2ff;
             --accent-gradient-end: #e322d9;
-            --success-color: #28a745;
+            --success-color: #23d160;
+            --danger-color: #ff3860;
             --card-border-color: rgba(255, 255, 255, 0.1);
             --icon-box-color: rgba(0, 0, 0, 0.25);
         }
+
+        /* --- Base & Animation Styles --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animated {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
             font-family: 'Exo 2', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color-primary);
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column; /* Changed for footer */
+            justify-content: flex-start; /* Changed for footer */
+            align-items: center; /* Changed for footer */
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
             overflow-y: auto;
         }
+
         #particles-js {
             position: fixed;
             width: 100%;
@@ -41,33 +67,101 @@
             left: 0;
             z-index: -1;
         }
+
+        /* --- Containers --- */
         .main-container, .success-page-container {
             width: 100%;
             max-width: 450px;
             z-index: 1;
             display: none;
+            flex-grow: 1; /* Allow content to push footer down */
         }
+        
+        .main-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header & New Menu --- */
         .header {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
             justify-content: space-between;
-            padding: 10px 5px;
+            padding: 10px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         .header h1 {
             font-size: 1.1rem;
             margin: 0;
-            flex-grow: 1;
-            text-align: center;
             font-weight: 500;
+        }
+        .header .menu-icon {
+            font-size: 1.2rem;
+            color: var(--text-color-secondary);
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+        .header .menu-icon:hover {
             color: var(--text-color-primary);
         }
-        .close-btn {
-            font-size: 1.5rem;
+
+        #menu-popup {
+            position: absolute;
+            top: 55px;
+            right: 15px;
+            background-color: rgba(35, 35, 55, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid var(--card-border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            z-index: 20;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        #menu-popup.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            color: var(--text-color-primary);
+            padding: 12px 15px;
+            text-align: left;
+            border-radius: 8px;
             cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.2s ease;
+        }
+        .menu-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .menu-button .main-text {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .menu-button .sub-text {
+            font-size: 0.8rem;
             color: var(--text-color-secondary);
         }
-        .generator-card, .how-to-card, .success-card {
+
+
+        /* --- Cards --- */
+        .card {
             background-color: var(--card-background-color);
             border-radius: 25px;
             padding: 30px;
@@ -76,7 +170,50 @@
             text-align: center;
             margin-bottom: 25px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            opacity: 0; /* Initially hidden for animation */
         }
+        
+        /* --- Notification Styles --- */
+        .notification-bar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            padding: 15px 25px;
+            border-radius: 15px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 90%;
+            box-sizing: border-box;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -100px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .notification-bar.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, 0);
+        }
+        .notification-bar.success {
+            background: linear-gradient(90deg, #28a745, #228b22);
+        }
+        .notification-bar.info {
+            background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+        }
+        .notification-bar.danger {
+             background: linear-gradient(90deg, #ff3860, #d60b33);
+        }
+        .notification-bar.admin {
+            background: linear-gradient(90deg, #ffc107, #ff8c00);
+        }
+
+
+        /* --- Generator Card Specific Styles --- */
         .generator-card .icon-container {
             width: 90px;
             height: 90px;
@@ -92,101 +229,179 @@
             font-size: 40px;
             color: white;
         }
+        .generator-card .icon-container .fa-key {
+            font-size: 20px;
+            position: absolute;
+            transform: translate(12px, 10px) rotate(45deg);
+            color: #ffd700;
+            text-shadow: 0 0 5px black;
+        }
         .generator-card h2 {
             font-size: 2.2rem;
             margin: 0 0 10px 0;
             font-weight: 700;
-            color: var(--text-color-primary);
+            background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .generator-card .subtitle {
             color: var(--text-color-secondary);
             margin-bottom: 30px;
             font-size: 1.1rem;
         }
+        
+        /* --- General Button Shine & Tap Effect --- */
+        .validity-btn, .action-button, .copy-button, .visit-button {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        .validity-btn::before, .action-button::before, .copy-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 75%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+        }
+        .validity-btn:hover::before, .action-button:hover::before, .copy-button:hover::before {
+            left: 125%;
+        }
+        .validity-btn:active, .action-button:active, .copy-button:active, .visit-button:active {
+            transform: scale(0.97);
+        }
+
+        /* --- How-to-Link & Validity Buttons --- */
+        .how-to-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--icon-box-color);
+            padding: 12px 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-color-primary);
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .how-to-link:hover {
+            background-color: rgba(30, 30, 48, 1);
+        }
+        .how-to-link i { color: var(--accent-gradient-start); }
+
+        .validity-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .validity-btn {
+            background-color: var(--icon-box-color);
+            border: 2px solid transparent;
+            color: var(--text-color-primary);
+            padding: 18px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .validity-btn.active {
+            background: linear-gradient(var(--card-background-color), var(--card-background-color)) padding-box,
+                        linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end)) border-box;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+        }
+
+        /* --- Info Box --- */
         .info-box {
             background-color: var(--icon-box-color);
             border-radius: 20px;
             padding: 15px 20px;
-            margin-bottom: 30px;
+            margin-top: 25px;
+            text-align: left;
         }
         .info-item {
             display: flex;
             align-items: center;
             padding: 12px 0;
+            font-size: 1rem;
         }
         .info-item:not(:last-child) {
-             border-bottom: 1px solid var(--card-border-color);
+            border-bottom: 1px solid var(--card-border-color);
         }
         .info-item .info-icon {
             color: var(--text-color-secondary);
             width: 30px;
-            font-size: 1.1rem;
         }
         .info-item .info-label {
             color: var(--text-color-secondary);
             flex-grow: 1;
-            text-align: left;
             font-weight: 500;
         }
         .info-item .info-value {
             font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--text-color-primary);
         }
+
+        /* --- Main Action Button --- */
         .action-button {
             display: block;
             width: 100%;
             padding: 18px;
             border: none;
-            border-radius: 15px;
+            border-radius: 18px;
             background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
             color: white;
             font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease-in-out;
             text-decoration: none;
-            box-shadow: 0 4px 20px rgba(0, 210, 255, 0.25);
+            margin-top: 25px;
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.25);
         }
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(227, 34, 217, 0.3);
-        }
+
+        /* --- How To/Tutorial Card --- */
         .how-to-card {
             text-align: left;
         }
         .how-to-card h3 {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-weight: 600;
-        }
-        .how-to-card h3 .fa-thumbs-up {
-            color: var(--accent-gradient-start);
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .video-thumbnail-link {
             display: block;
             position: relative;
-            width: 100%;
-            padding-top: 56.25%;
+            margin: 20px 0;
             border-radius: 15px;
-            background-color: #000;
-            background-image: url('https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg');
-            background-size: cover;
-            background-position: center;
-            margin-bottom: 25px;
             overflow: hidden;
             cursor: pointer;
+        }
+        .video-thumbnail-link img {
+            width: 100%;
+            display: block;
         }
         .video-thumbnail-link .play-icon {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 5rem;
-            color: rgba(255, 0, 0, 0.85);
-            transition: transform 0.2s;
+            font-size: 4rem;
+            color: #ff0000;
+            text-shadow: 0 0 10px black;
+            transition: transform 0.3s;
         }
         .video-thumbnail-link:hover .play-icon {
             transform: translate(-50%, -50%) scale(1.1);
@@ -194,41 +409,43 @@
         .instructions-list {
             list-style: none;
             padding: 0;
-            margin: 25px 0 0 0;
-            text-align: left;
+            margin-top: 30px;
         }
         .instructions-list li {
+            background-color: var(--icon-box-color);
+            border-radius: 15px;
+            padding: 18px;
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
-            gap: 18px;
-            color: var(--text-color-secondary);
+            gap: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent-gradient-start);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .instructions-list li.tapped {
+            transform: scale(1.05);
         }
         .instructions-list .instruction-icon {
             font-size: 1.5rem;
-            flex-shrink: 0;
+            width: 30px;
+            text-align: center;
         }
-        .icon-lightbulb { color: #ffc107; }
-        .icon-target { color: #dc3545; }
-        .icon-warning { color: #ffc107; }
-        .success-card {
-            padding: 40px;
-        }
+        .instructions-list .icon-play { color: var(--accent-gradient-start); }
+        .instructions-list .icon-list { color: #f39c12; }
+        .instructions-list .icon-clock { color: #3498db; }
+        .instructions-list .icon-refresh { color: #9b59b6; }
+        
+
+        /* --- Success Page --- */
         .success-card .success-icon {
             font-size: 60px;
             color: var(--success-color);
-            margin-bottom: 20px;
         }
         .success-card h2 {
             font-size: 2.2rem;
-            margin: 0 0 10px 0;
             color: var(--success-color);
             font-weight: 800;
-        }
-        .success-card p {
-            color: var(--text-color-secondary);
-            font-size: 1.1rem;
-            line-height: 1.6;
         }
         .access-key-box {
             background-color: rgba(0,0,0,0.4);
@@ -240,7 +457,7 @@
             margin: 25px 0;
             user-select: all;
             border: 1px dashed var(--card-border-color);
-            color: var(--text-color-primary);
+            word-break: break-all;
         }
         .copy-button {
             display: inline-flex;
@@ -254,17 +471,17 @@
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
         .expiry-note {
-            font-size: 0.9rem;
+            font-size: 1rem;
             margin-top: 25px;
-            color: var(--text-color-secondary);
-            opacity: 0.8;
+            color: var(--danger-color);
+            font-weight: 500;
+            height: 25px;
         }
         .visit-button {
             display: block;
-            width: 80%;
+            width: 90%;
             margin: 20px auto 0 auto;
             padding: 15px;
             border-radius: 15px;
@@ -275,61 +492,145 @@
             cursor: pointer;
             background: linear-gradient(var(--card-background-color), var(--card-background-color)) padding-box, linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end)) border-box;
             border: 2px solid transparent;
-            transition: all 0.3s;
+        }
+
+        /* --- Footer --- */
+        .site-footer {
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: var(--icon-box-color);
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: var(--text-color-secondary);
+            z-index: 1;
+        }
+        .site-footer a {
+            color: var(--text-color-primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .site-footer a:hover {
+            color: var(--accent-gradient-start);
         }
     </style>
 </head>
 <body>
     <div id="particles-js"></div>
-    
+    <div id="notification-bar" class="notification-bar"></div>
+
     <div class="main-container" id="generatorPage">
         <div class="header">
-            <i class="fas fa-times close-btn"></i>
-            <h1>Generate Access Key</h1>
-            <div style="width: 24px;"></div>
-        </div>
-        <div class="generator-card">
-            <div class="icon-container"><i class="fas fa-lock"></i></div>
-            <h2>Access Key Generator</h2>
-            <p class="subtitle">Generate your secure access key instantly</p>
-            <div class="info-box">
-                <div class="info-item"><i class="fas fa-clock info-icon"></i><span class="info-label">Validity</span><span class="info-value" id="courseAccessDisplay">Loading...</span></div>
-                <div class="info-item"><i class="fas fa-bolt info-icon"></i><span class="info-label">Generation</span><span class="info-value">Instant</span></div>
-                <div class="info-item"><i class="fas fa-shield-halved info-icon"></i><span class="info-label">Security</span><span class="info-value">Advanced</span></div>
+            <i class="fas fa-times menu-icon" style="opacity: 0; pointer-events: none;"></i> <h1>Generate Access Key</h1>
+            <i class="fas fa-ellipsis-v menu-icon" id="menuIcon"></i>
+            <div id="menu-popup">
+                <a href="#" class="menu-button" id="menuLink1">
+                    <span class="main-text">Skillneast</span>
+                    <span class="sub-text">Main Website</span>
+                </a>
+                <a href="#" class="menu-button" id="menuLink2">
+                    <span class="main-text">All Websites</span>
+                    <span class="sub-text">Neast Hub</span>
+                </a>
             </div>
-            <button class="action-button" id="generateButton">Generate Access Key</button>
         </div>
-        <div class="how-to-card">
-            <h3><i class="fa-solid fa-thumbs-up"></i> How to Generate Key</h3>
-            <p class="subtitle">Watch this quick tutorial to learn the process</p>
-            <a id="tutorialLink" href="#" class="video-thumbnail-link" target="_blank" rel="noopener noreferrer"><i class="far fa-play-circle play-icon"></i></a>
-            <ul class="instructions-list">
-                <li><i class="fa-solid fa-lightbulb instruction-icon icon-lightbulb"></i><span>Watch the tutorial before generating your key</span></li>
-                <li><i class="fa-solid fa-bullseye instruction-icon icon-target"></i><span>Follow the steps exactly as shown in the video</span></li>
-                <li><i class="fa-solid fa-triangle-exclamation instruction-icon icon-warning"></i><span>Keep your generated key secure and private</span></li>
+
+        <div class="card generator-card">
+            <div class="icon-container">
+                <i class="fas fa-lock"></i>
+                <i class="fas fa-key"></i>
+            </div>
+            <h2>Access Key Generator</h2>
+            <p class="subtitle">Generate your secure access key instantly.</p>
+
+            <a href="#howToSection" class="how-to-link">
+                <i class="fas fa-question-circle"></i>
+                <span>Don't know how to generate key? Click here</span>
+                <i class="fas fa-arrow-down"></i>
+            </a>
+
+            <div class="validity-selector">
+                <button class="validity-btn" data-option="option1"><i class="fas fa-clock"></i> Loading...</button>
+                <button class="validity-btn" data-option="option2"><i class="fas fa-hourglass-half"></i> Loading...</button>
+            </div>
+            
+            <div id="infoBoxContainer" style="display: none;">
+                <div class="info-box">
+                    <div class="info-item">
+                        <i class="fas fa-clock info-icon"></i>
+                        <span class="info-label">Validity</span>
+                        <span class="info-value" id="validityDisplay"></span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-bolt info-icon"></i>
+                        <span class="info-label">Generation</span>
+                        <span class="info-value">Instant</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-shield-halved info-icon"></i>
+                        <span class="info-label">Security</span>
+                        <span class="info-value">Advanced</span>
+                    </div>
+                </div>
+                <button class="action-button" id="generateButton">Generate Access Key</button>
+            </div>
+        </div>
+
+        <div class="card how-to-card" id="howToSection">
+            <h3><i class="fa-solid fa-thumbs-up"></i>How to Generate Key</h3>
+            <p class="subtitle">Watch this comprehensive tutorial to learn the complete process step by step.</p>
+            
+            <a id="tutorialLink" href="#" class="video-thumbnail-link" target="_blank" rel="noopener noreferrer">
+                <img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt="Video Tutorial Thumbnail">
+                <i class="far fa-play-circle play-icon"></i>
+            </a>
+
+            <h3><i class="fas fa-lightbulb"></i> Important Tips</h3>
+             <ul class="instructions-list">
+                <li><i class="fas fa-play instruction-icon icon-play"></i><span>Watch the complete tutorial before generating your key</span></li>
+                <li><i class="fas fa-list-check instruction-icon icon-list"></i><span>Follow each step exactly as demonstrated</span></li>
+                <li><i class="fas fa-clock instruction-icon icon-clock"></i><span>Choose the appropriate validity duration for your needs</span></li>
+                <li><i class="fas fa-arrows-rotate instruction-icon icon-refresh"></i><span>You can generate a new key anytime after expiration</span></li>
             </ul>
         </div>
     </div>
     
     <div class="success-page-container" id="successPage">
-        <div class="success-card">
-            <i class="fas fa-check-circle success-icon"></i> <h2>Key Generated!</h2>
+        <div class="card success-card">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2>Key Generated!</h2>
             <p>Copy this key and paste it on our courses website to get access.</p>
             <div class="access-key-box" id="accessKeyBox">Generating...</div>
-            <button class="copy-button" id="copyButton"> <i class="fas fa-copy"></i> <span id="copyButtonText">Copy Key</span> </button>
-            <p class="expiry-note" id="expiryNote">This key is for one-time use.</p>
-            <a id="visitCoursesBtn" href="#" class="visit-button" target="_blank"><i class="fas fa-external-link-alt"></i> Visit Website and Enter Key</a>
+            <button class="copy-button" id="copyButton">
+                <i class="fas fa-copy"></i>
+                <span id="copyButtonText">Copy Key</span>
+            </button>
+            <p class="expiry-note" id="expiryNote"></p>
+            <a id="visitCoursesBtn" href="#" class="visit-button"><i class="fas fa-external-link-alt"></i> Visit Website & Enter Key</a>
         </div>
     </div>
+
+    <footer class="site-footer">
+        Created by <a href="#skillneast" target="_blank" rel="noopener">Skillneast</a> • 
+        Powered by <a href="#apnastudy" target="_blank" rel="noopener">Apna Study</a>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
         import { getDatabase, ref, set, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
-        
-        // ** YEH LINE THEEK KAR DI GAYI HAI **
-        particlesJS('particles-js', { particles: { number: { value: 40 }, color: { value: "#ffffff" }, shape: { type: "circle" }, opacity: { value: 0.3, random: true }, size: { value: 2, random: true }, line_linked: { enable: false }, move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out", bounce: false, } }, interactivity: { detect_on: "canvas", events: { onhover: { enable: false }, onclick: { enable: false }, resize: true, } }, retina_detect: true });
-        
+
+        // --- High Quality Particles.js Config ---
+        particlesJS('particles-js', {
+            "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#ffffff" }, "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } }, "opacity": { "value": 0.5, "random": false, "anim": { "enable": false, "speed": 1, "opacity_min": 0.1, "sync": false } }, "size": { "value": 3, "random": true, "anim": { "enable": false, "speed": 40, "size_min": 0.1, "sync": false } }, "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false, "attract": { "enable": false, "rotateX": 600, "rotateY": 1200 } } },
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }, "modes": { "grab": { "distance": 400, "line_linked": { "opacity": 1 } }, "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 }, "repulse": { "distance": 200, "duration": 0.4 }, "push": { "particles_nb": 4 }, "remove": { "particles_nb": 2 } } },
+            "retina_detect": true
+        });
+
+        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyChwpbFb6M4HtG6zwjg0AXh7Lz9KjnrGZk",
             authDomain: "adminneast.firebaseapp.com",
@@ -342,85 +643,244 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        const settingsRef = ref(db, 'key_generator_settings/config');
+        // --- DOM Elements ---
         const generatorPage = document.getElementById('generatorPage');
         const successPage = document.getElementById('successPage');
-        
-        let settings = {
-            shortenerUrl: "#",
-            shortenerDomain: "",
-            tutorialUrl: "#",
-            coursesUrl: "#",
-            tempKeyValidityMinutes: 15,
-            courseAccessHours: 24
-        };
+        const expiryNoteEl = document.getElementById('expiryNote');
+        const notificationBar = document.getElementById('notification-bar');
+        const infoBoxContainer = document.getElementById('infoBoxContainer');
+        const validityButtons = document.querySelectorAll('.validity-btn');
+        const menuIcon = document.getElementById('menuIcon');
+        const menuPopup = document.getElementById('menu-popup');
+        const instructionItems = document.querySelectorAll('.instructions-list li');
 
+        let settings = {};
+        let countdownInterval;
+
+        // --- Notification Functions ---
+        function showNotification(message, type = 'info', duration = 3000) {
+            notificationBar.innerHTML = message;
+            notificationBar.className = 'notification-bar';
+            notificationBar.classList.add(type, 'show');
+            setTimeout(() => {
+                notificationBar.classList.remove('show');
+            }, duration);
+        }
+
+        function showAdminNotification(message) {
+            notificationBar.innerHTML = `<i class="fas fa-bullhorn"></i>   ${message}`;
+            notificationBar.className = 'notification-bar admin show';
+
+            const dismissNotification = () => {
+                setTimeout(() => {
+                    notificationBar.classList.remove('show');
+                }, 7000); // Disappears after 7 seconds
+            };
+            window.addEventListener('click', dismissNotification, { once: true });
+        }
+        
+        // --- Update UI with Firebase Settings ---
+        function applySettings() {
+            // Menu Links
+            document.getElementById('menuLink1').href = settings.menuLinks?.link1 || '#';
+            document.getElementById('menuLink2').href = settings.menuLinks?.link2 || '#';
+
+            // Duration Buttons
+            const [durationBtn1, durationBtn2] = validityButtons;
+            if (settings.durations?.option1?.label) {
+                durationBtn1.innerHTML = `<i class="fas fa-clock"></i> ${settings.durations.option1.label}`;
+            }
+            if (settings.durations?.option2?.label) {
+                durationBtn2.innerHTML = `<i class="fas fa-hourglass-half"></i> ${settings.durations.option2.label}`;
+            }
+
+            // Tutorial URL and Thumbnail
+            if (settings.tutorialUrl) {
+                const tutorialLink = document.getElementById('tutorialLink');
+                tutorialLink.href = settings.tutorialUrl;
+                try {
+                    const videoId = new URL(settings.tutorialUrl).searchParams.get('v');
+                    if (videoId) {
+                        tutorialLink.querySelector('img').src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                    }
+                } catch (e) {
+                    console.warn("Could not parse YouTube URL for thumbnail.", e);
+                }
+            }
+
+            // Visit Courses Button URL (on success page)
+            document.getElementById('visitCoursesBtn').href = settings.coursesUrl || '#';
+        }
+
+        // --- Page Initialization ---
         async function initializePage() {
             try {
+                const settingsRef = ref(db, 'key_generator_settings/config');
                 const snapshot = await get(settingsRef);
-                if (snapshot.exists()) {
-                    settings = snapshot.val();
+
+                if (!snapshot.exists()) {
+                    showNotification("System configuration not found. Please contact admin.", 'danger', 5000);
+                    return;
+                }
+                settings = snapshot.val();
+                
+                applySettings();
+
+                if (settings.adminNotification && settings.adminNotification.trim() !== "") {
+                    showAdminNotification(settings.adminNotification);
                 }
             } catch (error) {
-                console.error("Settings fetch karne me error:", error);
+                console.error("Error fetching settings:", error);
+                showNotification("Error connecting to server.", 'danger', 5000);
             }
             
-            document.getElementById('courseAccessDisplay').textContent = `${settings.courseAccessHours} Hours`;
-            document.getElementById('tutorialLink').setAttribute('href', settings.tutorialUrl);
-            
+            const keySession = JSON.parse(sessionStorage.getItem('keySession'));
+            if (keySession && keySession.expiry > Date.now()) {
+                displaySuccessPageFromSession(keySession);
+                return;
+            } else {
+                sessionStorage.removeItem('keySession');
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status');
             const referrer = document.referrer;
             let isVerified = false;
 
             if (status === 'success') {
-                if (settings.shortenerDomain && settings.shortenerDomain.trim() !== '') {
-                    if (referrer && referrer.includes(settings.shortenerDomain)) {
+                const selectedOptionJSON = sessionStorage.getItem('selectedOption');
+                if(selectedOptionJSON) {
+                    const selectedOption = JSON.parse(selectedOptionJSON);
+                    const expectedDomain = selectedOption.shortenerDomain;
+                     if (expectedDomain && expectedDomain.trim() !== '') {
+                        if (referrer && referrer.includes(expectedDomain)) isVerified = true;
+                    } else {
                         isVerified = true;
                     }
-                } else {
-                    isVerified = true;
                 }
             }
 
             if (isVerified) {
-                showSuccessPage();
+                generateNewSuccessSession();
             } else {
                 showGeneratorPage();
             }
+            
+            setupEventListeners();
         }
-
+        
+        // --- Show Generator Page Logic ---
         function showGeneratorPage() {
-            generatorPage.style.display = 'block';
+            generatorPage.style.display = 'flex';
             successPage.style.display = 'none';
-            document.getElementById('generateButton').addEventListener('click', () => {
-                window.location.href = settings.shortenerUrl;
+            document.querySelectorAll('#generatorPage .card').forEach((card, index) => {
+                setTimeout(() => card.classList.add('animated'), index * 150);
             });
         }
 
-        function showSuccessPage() {
+        // --- Success Page Logic ---
+        function generateNewSuccessSession() {
+            const newKey = generateAccessKey();
+            const expiryTimestamp = Date.now() + (settings.tempKeyValidityMinutes || 15) * 60 * 1000;
+            
+            const selectedOptionJSON = sessionStorage.getItem('selectedOption');
+            // Default to option1 if nothing is selected for some reason
+            const selectedOption = selectedOptionJSON ? JSON.parse(selectedOptionJSON) : settings.durations.option1;
+            const validityHours = selectedOption.validityHours;
+
+            const sessionData = { key: newKey, expiry: expiryTimestamp };
+            sessionStorage.setItem('keySession', JSON.stringify(sessionData));
+            
+            const keyRef = ref(db, 'access_keys/' + newKey);
+            set(keyRef, { 
+                used: false, 
+                createdAt: serverTimestamp(),
+                validityHours: parseInt(validityHours) 
+            });
+
+            displaySuccessPageFromSession(sessionData);
+        }
+
+        function displaySuccessPageFromSession(sessionData) {
             generatorPage.style.display = 'none';
             successPage.style.display = 'block';
-            
-            const newKey = generateAccessKey();
-            document.getElementById('accessKeyBox').textContent = newKey;
-            document.getElementById('expiryNote').textContent = `This temp key will expire in ${settings.tempKeyValidityMinutes} minutes.`;
-            document.getElementById('visitCoursesBtn').setAttribute('href', settings.coursesUrl);
+            document.querySelector('#successPage .card').classList.add('animated');
 
-            const keyRef = ref(db, 'access_keys/' + newKey);
-            set(keyRef, {
-                used: false,
-                createdAt: serverTimestamp(),
-                expiresIn: settings.tempKeyValidityMinutes * 60 * 1000 
-            });
+            document.getElementById('accessKeyBox').textContent = sessionData.key;
+            document.getElementById('copyButton').onclick = () => {
+                navigator.clipboard.writeText(sessionData.key);
+                document.getElementById('copyButtonText').textContent = 'Copied!';
+                setTimeout(() => { document.getElementById('copyButtonText').textContent = 'Copy Key'; }, 2000);
+            };
+            startCountdown(sessionData.expiry);
+        }
 
-            document.getElementById('copyButton').addEventListener('click', () => {
-                navigator.clipboard.writeText(newKey).then(() => {
-                    const copyBtnText = document.getElementById('copyButtonText');
-                    copyBtnText.textContent = 'Copied!';
-                    setTimeout(() => { copyBtnText.textContent = 'Copy Key'; }, 2000);
+        // --- Helper Functions & Event Listeners ---
+        function setupEventListeners() {
+            validityButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const optionKey = button.dataset.option;
+                    if (!optionKey || !settings.durations || !settings.durations[optionKey]) return;
+
+                    const selectedOption = settings.durations[optionKey];
+                    sessionStorage.setItem('selectedOption', JSON.stringify(selectedOption));
+
+                    validityButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    document.getElementById('validityDisplay').textContent = selectedOption.label;
+                    infoBoxContainer.style.display = 'block';
+                    showNotification(`Switched to ${selectedOption.label} validity.`, 'info');
                 });
             });
+
+            document.getElementById('generateButton').addEventListener('click', () => {
+                const selectedOptionJSON = sessionStorage.getItem('selectedOption');
+                if (selectedOptionJSON) {
+                    const selectedOption = JSON.parse(selectedOptionJSON);
+                    if (selectedOption.shortenerUrl) {
+                        window.location.href = selectedOption.shortenerUrl;
+                    } else {
+                        showNotification('Shortener URL is not configured.', 'danger');
+                    }
+                } else {
+                    showNotification('Please select a validity period first.', 'danger');
+                }
+            });
+
+            menuIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                menuPopup.classList.toggle('show');
+            });
+
+            window.addEventListener('click', () => {
+                if (menuPopup.classList.contains('show')) {
+                    menuPopup.classList.remove('show');
+                }
+            });
+
+            instructionItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.classList.add('tapped');
+                    setTimeout(() => { this.classList.remove('tapped'); }, 300);
+                });
+            });
+        }
+
+        function startCountdown(expiryTimestamp) {
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                const remaining = expiryTimestamp - Date.now();
+                if (remaining <= 0) {
+                    clearInterval(countdownInterval);
+                    sessionStorage.removeItem('keySession');
+                    window.location.href = window.location.pathname;
+                    return;
+                }
+                const minutes = Math.floor((remaining / 1000 / 60) % 60);
+                const seconds = Math.floor((remaining / 1000) % 60);
+                expiryNoteEl.textContent = `This page will expire in ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
         }
 
         function generateAccessKey(length = 16) {
