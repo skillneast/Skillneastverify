@@ -390,6 +390,7 @@
         .video-thumbnail-link img {
             width: 100%;
             display: block;
+            transition: opacity 0.3s ease;
         }
         .video-thumbnail-link .play-icon {
             position: absolute;
@@ -582,7 +583,7 @@
             <p class="subtitle">Watch this comprehensive tutorial to learn the complete process step by step.</p>
             
             <a id="tutorialLink" href="#" class="video-thumbnail-link" target="_blank" rel="noopener noreferrer">
-                <img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt="Video Tutorial Thumbnail">
+                <img id="tutorialThumbnail" src="https://i.ytimg.com/vi/placeholder/hqdefault.jpg" alt="Video Tutorial Thumbnail">
                 <i class="far fa-play-circle play-icon"></i>
             </a>
 
@@ -651,6 +652,8 @@
         const menuIcon = document.getElementById('menuIcon');
         const menuPopup = document.getElementById('menu-popup');
         const instructionItems = document.querySelectorAll('.instructions-list li');
+        const tutorialLinkEl = document.getElementById('tutorialLink');
+        const tutorialThumbnailEl = document.getElementById('tutorialThumbnail');
 
         let settings = {};
         let countdownInterval;
@@ -677,6 +680,33 @@
             window.addEventListener('click', dismissNotification, { once: true });
         }
         
+        // --- NEW: Function to update tutorial video ---
+        function updateTutorialVideo(url) {
+            if (!url || !tutorialLinkEl || !tutorialThumbnailEl) return;
+            
+            tutorialLinkEl.href = url;
+            let videoId = 'placeholder';
+            try {
+                // Try to get video ID from standard YouTube URL
+                const urlObj = new URL(url);
+                if (urlObj.hostname === "www.youtube.com" || urlObj.hostname === "youtube.com") {
+                    videoId = urlObj.searchParams.get('v');
+                } else if (urlObj.hostname === "youtu.be") {
+                    videoId = urlObj.pathname.slice(1);
+                }
+            } catch (e) {
+                console.warn("Could not parse YouTube URL for thumbnail.", e);
+            }
+
+            if (videoId) {
+                tutorialThumbnailEl.style.opacity = '0';
+                setTimeout(() => {
+                    tutorialThumbnailEl.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                    tutorialThumbnailEl.style.opacity = '1';
+                }, 300);
+            }
+        }
+        
         // --- Update UI with Firebase Settings ---
         function applySettings() {
             // Menu Links
@@ -692,22 +722,13 @@
                 durationBtn2.innerHTML = `<i class="fas fa-hourglass-half"></i> ${settings.durations.option2.label}`;
             }
 
-            // Tutorial URL and Thumbnail
-            if (settings.tutorialUrl) {
-                const tutorialLink = document.getElementById('tutorialLink');
-                tutorialLink.href = settings.tutorialUrl;
-                try {
-                    const videoId = new URL(settings.tutorialUrl).searchParams.get('v');
-                    if (videoId) {
-                        tutorialLink.querySelector('img').src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-                    }
-                } catch (e) {
-                    console.warn("Could not parse YouTube URL for thumbnail.", e);
-                }
+            // NEW: Set default tutorial video on load
+            if (settings.defaultTutorialUrl) {
+                updateTutorialVideo(settings.defaultTutorialUrl);
             }
 
             // Visit Courses Button URL (on success page)
-            document.getElementById('visitCoursesBtn').href = settings.coursesUrl || '#';
+            document.getElementById('visitCoursesBtn').href = settings.coursesUrl || 'test.html'; // Fallback to test.html
         }
 
         // --- Page Initialization ---
@@ -779,21 +800,25 @@
         // --- Success Page Logic ---
         function generateNewSuccessSession() {
             const newKey = generateAccessKey();
-            const expiryTimestamp = Date.now() + (settings.tempKeyValidityMinutes || 15) * 60 * 1000;
+            const pageExpiryTimestamp = Date.now() + (settings.tempKeyValidityMinutes || 15) * 60 * 1000;
             
             const selectedOptionJSON = sessionStorage.getItem('selectedOption');
             // Default to option1 if nothing is selected for some reason
             const selectedOption = selectedOptionJSON ? JSON.parse(selectedOptionJSON) : settings.durations.option1;
             const validityHours = selectedOption.validityHours;
 
-            const sessionData = { key: newKey, expiry: expiryTimestamp };
+            // **NEW**: Set the key's own expiry time (15 minutes from now)
+            const keyExpiresAt = Date.now() + (15 * 60 * 1000);
+
+            const sessionData = { key: newKey, expiry: pageExpiryTimestamp };
             sessionStorage.setItem('keySession', JSON.stringify(sessionData));
             
             const keyRef = ref(db, 'access_keys/' + newKey);
             set(keyRef, { 
                 used: false, 
                 createdAt: serverTimestamp(),
-                validityHours: parseInt(validityHours) 
+                validityHours: parseInt(validityHours),
+                expiresAt: keyExpiresAt // **NEW**: Saving key's expiry time to Firebase
             });
 
             displaySuccessPageFromSession(sessionData);
@@ -828,6 +853,12 @@
                     
                     document.getElementById('validityDisplay').textContent = selectedOption.label;
                     infoBoxContainer.style.display = 'block';
+                    
+                    // NEW: Update tutorial video when an option is selected
+                    if (selectedOption.tutorialUrl) {
+                        updateTutorialVideo(selectedOption.tutorialUrl);
+                    }
+                    
                     showNotification(`Switched to ${selectedOption.label} validity.`, 'info');
                 });
             });
@@ -836,8 +867,13 @@
                 const selectedOptionJSON = sessionStorage.getItem('selectedOption');
                 if (selectedOptionJSON) {
                     const selectedOption = JSON.parse(selectedOptionJSON);
-                    if (selectedOption.shortenerUrl) {
-                        window.location.href = selectedOption.shortenerUrl;
+
+                    // NEW: Check for #free option
+                    if (selectedOption.shortenerUrl === '#free') {
+                        showNotification('Generating your free key...', 'success');
+                        generateNewSuccessSession(); // Generate key directly
+                    } else if (selectedOption.shortenerUrl) {
+                        window.location.href = selectedOption.shortenerUrl; // Redirect to shortener
                     } else {
                         showNotification('Shortener URL is not configured.', 'danger');
                     }
@@ -872,12 +908,13 @@
                 if (remaining <= 0) {
                     clearInterval(countdownInterval);
                     sessionStorage.removeItem('keySession');
-                    window.location.href = window.location.pathname;
+                    const homePageUrl = settings.coursesUrl || 'test.html';
+                    window.location.href = homePageUrl;
                     return;
                 }
                 const minutes = Math.floor((remaining / 1000 / 60) % 60);
                 const seconds = Math.floor((remaining / 1000) % 60);
-                expiryNoteEl.textContent = `This page will expire in ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                expiryNoteEl.textContent = `This key and page will expire in ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }, 1000);
         }
 
